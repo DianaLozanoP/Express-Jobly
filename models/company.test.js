@@ -31,7 +31,7 @@ describe("create", function () {
     expect(company).toEqual(newCompany);
 
     const result = await db.query(
-          `SELECT handle, name, description, num_employees, logo_url
+      `SELECT handle, name, description, num_employees, logo_url
            FROM companies
            WHERE handle = 'new'`);
     expect(result.rows).toEqual([
@@ -129,7 +129,7 @@ describe("update", function () {
     });
 
     const result = await db.query(
-          `SELECT handle, name, description, num_employees, logo_url
+      `SELECT handle, name, description, num_employees, logo_url
            FROM companies
            WHERE handle = 'c1'`);
     expect(result.rows).toEqual([{
@@ -156,7 +156,7 @@ describe("update", function () {
     });
 
     const result = await db.query(
-          `SELECT handle, name, description, num_employees, logo_url
+      `SELECT handle, name, description, num_employees, logo_url
            FROM companies
            WHERE handle = 'c1'`);
     expect(result.rows).toEqual([{
@@ -193,7 +193,7 @@ describe("remove", function () {
   test("works", async function () {
     await Company.remove("c1");
     const res = await db.query(
-        "SELECT handle FROM companies WHERE handle='c1'");
+      "SELECT handle FROM companies WHERE handle='c1'");
     expect(res.rows.length).toEqual(0);
   });
 
@@ -206,3 +206,74 @@ describe("remove", function () {
     }
   });
 });
+
+/***************filter */
+
+describe("filter", function () {
+  test("filter based on nameLike, minimumEmployees and maxEmployees", async function () {
+    const nameLike = 'C';
+    const minEmployees = 1;
+    const maxEmployees = 3;
+    const companies = await Company.filter(nameLike, minEmployees, maxEmployees);
+    expect(companies).toEqual([
+      {
+        "description": "Desc1",
+        "handle": "c1",
+        "logoUrl": "http://c1.img",
+        "name": "C1",
+        "numEmployees": 1,
+      },
+      {
+        "description": "Desc2",
+        "handle": "c2",
+        "logoUrl": "http://c2.img",
+        "name": "C2",
+        "numEmployees": 2,
+      },
+      {
+        "description": "Desc3",
+        "handle": "c3",
+        "logoUrl": "http://c3.img",
+        "name": "C3",
+        "numEmployees": 3,
+      },
+    ]);
+  })
+  test("filter based only in minim number of employees", async function () {
+    const nameLike = undefined;
+    const minEmployees = 3;
+    const maxEmployees = undefined;
+    const companies = await Company.filter(nameLike, minEmployees, maxEmployees);
+    expect(companies).toEqual([
+      {
+        "description": "Desc3",
+        "handle": "c3",
+        "logoUrl": "http://c3.img",
+        "name": "C3",
+        "numEmployees": 3,
+      },
+    ])
+  });
+  test("filter based on name and maximum number of employees", async function () {
+    const nameLike = 'c';
+    const minEmployees = undefined;
+    const maxEmployees = 2;
+    const companies = await Company.filter(nameLike, minEmployees, maxEmployees);
+    expect(companies).toEqual([
+      {
+        "description": "Desc1",
+        "handle": "c1",
+        "logoUrl": "http://c1.img",
+        "name": "C1",
+        "numEmployees": 1,
+      },
+      {
+        "description": "Desc2",
+        "handle": "c2",
+        "logoUrl": "http://c2.img",
+        "name": "C2",
+        "numEmployees": 2,
+      },
+    ])
+  })
+})
