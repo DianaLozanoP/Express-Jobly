@@ -12,29 +12,29 @@ async function commonBeforeAll() {
   await db.query("DELETE FROM companies");
 
   await Company.create(
-      {
-        handle: "c1",
-        name: "C1",
-        numEmployees: 1,
-        description: "Desc1",
-        logoUrl: "http://c1.img",
-      });
+    {
+      handle: "c1",
+      name: "C1",
+      numEmployees: 1,
+      description: "Desc1",
+      logoUrl: "http://c1.img",
+    });
   await Company.create(
-      {
-        handle: "c2",
-        name: "C2",
-        numEmployees: 2,
-        description: "Desc2",
-        logoUrl: "http://c2.img",
-      });
+    {
+      handle: "c2",
+      name: "C2",
+      numEmployees: 2,
+      description: "Desc2",
+      logoUrl: "http://c2.img",
+    });
   await Company.create(
-      {
-        handle: "c3",
-        name: "C3",
-        numEmployees: 3,
-        description: "Desc3",
-        logoUrl: "http://c3.img",
-      });
+    {
+      handle: "c3",
+      name: "C3",
+      numEmployees: 3,
+      description: "Desc3",
+      logoUrl: "http://c3.img",
+    });
 
   await User.register({
     username: "u1",
@@ -44,13 +44,15 @@ async function commonBeforeAll() {
     password: "password1",
     isAdmin: false,
   });
+  //updated user 2 to be admin
+  //testing for admin priviledges will be done with user2
   await User.register({
     username: "u2",
     firstName: "U2F",
     lastName: "U2L",
     email: "user2@user.com",
     password: "password2",
-    isAdmin: false,
+    isAdmin: true,
   });
   await User.register({
     username: "u3",
@@ -76,6 +78,8 @@ async function commonAfterAll() {
 
 
 const u1Token = createToken({ username: "u1", isAdmin: false });
+//create a different token for admin, using user 2
+const u2Token = createToken({ username: "u2", isAdmin: true });
 
 
 module.exports = {
@@ -84,4 +88,5 @@ module.exports = {
   commonAfterEach,
   commonAfterAll,
   u1Token,
+  u2Token
 };

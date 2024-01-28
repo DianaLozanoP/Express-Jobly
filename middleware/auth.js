@@ -4,7 +4,7 @@
 
 const jwt = require("jsonwebtoken");
 const { SECRET_KEY } = require("../config");
-const { UnauthorizedError } = require("../expressError");
+const { UnauthorizedError, ExpressError } = require("../expressError");
 
 
 /** Middleware: Authenticate user.
@@ -41,9 +41,45 @@ function ensureLoggedIn(req, res, next) {
     return next(err);
   }
 }
+/**Middleware to ensure that only the admin is logged in
+* 
+* If not, return an error explaining must be an admin to make changes.
+*/
+function ensureAdmin(req, res, next) {
+  //checked if user is logged in
+  //checked that the logged in user is an admin
+  try {
+    if (!res.locals.user || !res.locals.user.isAdmin) {
+      return next(new ExpressError("Must be admin to go acces this.", 401))
+    }
+    return next();
+  }
+  catch (err) {
+    return next(err);
+  }
+}
 
+function ensureOwnUserOrAdmin(req, res, next) {
+  try {
+    //Check if we have the user logged in
+    if (!res.locals.user) {
+      //if not logged in then return unauthorized error
+      throw new UnauthorizedError();
+    }
+    //Check if the logged in user is the User of the params or it's an Admin
+    if (res.locals.user.username !== req.params.username && !res.locals.user.isAdmin) {
+      return next(new ExpressError("Unauthorized access. Only Admin or User Profile Owner can access."))
+    }
+    return next();
+  }
+  catch (err) {
+    return next(err);
+  }
+}
 
 module.exports = {
   authenticateJWT,
   ensureLoggedIn,
+  ensureAdmin,
+  ensureOwnUserOrAdmin
 };
