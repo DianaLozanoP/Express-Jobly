@@ -67,7 +67,7 @@ class Job {
             `DELETE
                  FROM jobs
                  WHERE id = $1
-                 RETURNING title`,
+                 RETURNING id, title`,
             [id]);
         const job = result.rows[0];
 
